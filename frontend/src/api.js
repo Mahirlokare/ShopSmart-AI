@@ -1,4 +1,5 @@
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const configured = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API = configured.startsWith('http') ? configured : 'https://' + configured;
 export async function request(path, options = {}) {
   const token = localStorage.getItem('shopsmart_token');
   const response = await fetch(API + path, {
