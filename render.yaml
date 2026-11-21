@@ -30,4 +30,4 @@ services:
         fromService:
           type: web
           name: shopsmart-ai-api
-          property: host
+          envVarKey: RENDER_EXTERNAL_HOSTNAME
