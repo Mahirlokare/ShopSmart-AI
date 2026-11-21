@@ -21,7 +21,6 @@ services:
   - type: web
     name: shopsmart-ai-store
     runtime: static
-    plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
