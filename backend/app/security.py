@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 from passlib.context import CryptContext
+from bson import ObjectId
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from .config import JWT_SECRET, JWT_EXPIRE_MINUTES
@@ -25,8 +26,11 @@ async def current_user(credentials: HTTPAuthorizationCredentials = Depends(beare
         raise HTTPException(status_code=401, detail="Authentication required")
     try:
         payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[ALGORITHM])
-        user = await db.users.find_one({"_id": payload.get("sub")}, {"password": 0})
-    except JWTError:
+        user_id = payload.get("sub")
+        if not user_id or not ObjectId.is_valid(user_id):
+            raise ValueError("Invalid user id")
+        user = await db.users.find_one({"_id": ObjectId(user_id)}, {"password": 0})
+    except (JWTError, ValueError):
         user = None
     if not user:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
